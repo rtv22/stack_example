@@ -39,6 +39,7 @@ stack<T>::~stack()
 template <typename T> 
 stack<T>::stack(const stack<T>& copy)
 {
+	std::lock_guard<std::mutex> lock(copy.mutex_);
 	T *tmp = new T[copy.array_size_];
 	count_ = copy.count_;
 	array_size_ = copy.array_size_;
