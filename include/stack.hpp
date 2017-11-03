@@ -40,15 +40,10 @@ stack<T>::~stack()
 template <typename T> 
 stack<T>::stack(const stack<T>& copy)
 {
-	std::lock_guard<std::mutex> lock(mutex_);
 	T *tmp = new T[copy.array_size_];
 	count_ = copy.count_;
 	array_size_ = copy.array_size_;
 	array_ = tmp;
-	if(array_ == nullptr){
-		throw "error";
-		delete[] array_;
-	}
 	std::copy(copy.array_, copy.array_ + count_, array_);
 }
 	
