@@ -48,7 +48,7 @@ stack<T>::stack(const stack<T>& copy)
 		std::copy(copy.array_, copy.array_ + count_, array_);
 	}
 	catch(...){
-		delete array_;
+		delete[] array_;
 	}
 }
 	
