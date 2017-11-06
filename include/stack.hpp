@@ -14,7 +14,6 @@ public:
 	void swap(stack<T>&); /*noexcept*/
 	std::shared_ptr<T> pop(); /*strong*/
 	/*T top(); strong*/
-	bool empty() const; /*noexcept*/
 	stack<T>& operator=(stack<T> &); /*noexcept*/
 	~stack();/*noexcept*/
 private:
@@ -60,19 +59,14 @@ size_t stack<T>::count() const
 	return count_;
 }
 
-template <typename T>
-bool stack<T>::empty() const 
-{
-	return (count_ == 0);
-}
-
 template<typename T> 
 void stack<T>::swap(stack& x) 
 {
-	x.mutex_.lock();
+	std::lock(mutex_, x.mutex_);
 	std::swap(x.array_size_, array_size_);
 	std::swap(count_, x.count_);
 	std::swap(x.array_, array_);
+	x.mutex_.lock();
 	x.mutex_.unlock();
 }
 
@@ -89,24 +83,35 @@ T stack<T>::top()
 template <typename T>
 void stack<T>::push(T const &value)
 {
-	mutex_.lock();
-	if (array_size_ == count_) 
+	std::lock_guard<std::mutex> lock(mutex_);
+	if (array_size_ == count_)
 	{
 		array_size_ *= 2;
-		stack<T> temp(*this);
-		swap(temp);
+		T* tmp = new T[array_size_];
+		try
+		{
+			std::copy(array_, array_ + count_, tmp);
+		}
+		catch(...)
+		{
+			   delete[] array_;
+			   throw;
+		}
+		delete[] array_;
+		array_ = tmp;
 	}
 	array_[count_] = value;
 	++count_;
-	mutex_.unlock();
 }
 
 template <typename T>
 auto stack<T>::pop() -> std::shared_ptr<T>
 {
 	std::lock_guard<std::mutex> lock(mutex_);
-	if (!empty())
-		--count_;
+	if (count_ == 0)
+	{
+		throw "Stack empty";
+	}
 	auto top = std::make_shared<T>(*array_);
 	return top;
 }
