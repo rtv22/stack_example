@@ -43,7 +43,8 @@ stack<T>::stack(const stack<T>& copy)
 	count_ = copy.count_;
 	array_size_ = copy.array_size_;
 	array_ = tmp;
-	try{
+	try
+	{
 		std::copy(copy.array_, copy.array_ + count_, array_);
 	}
 	catch(...){
@@ -84,21 +85,26 @@ template <typename T>
 void stack<T>::push(T const &value)
 {
 	std::lock_guard<std::mutex> lock(mutex_);
+	if (array_size_ == 0)
+	{
+		array_size_ = 1;
+		array_ = new T[array_size_];
+	}
 	if (array_size_ == count_)
 	{
-		array_size_ *= 2;
-		T* tmp = new T[array_size_];
+		array_size_ = array_size_ * 2;
+		T * new_array = new T[array_size_]();
 		try
 		{
-			std::copy(array_, array_ + count_, tmp);
+		std::copy(array_, array_ + count_, new_array);
 		}
 		catch(...)
 		{
-			   delete[];
+			   delete[] array_;
 			   throw;
 		}
 		delete[] array_;
-		array_ = tmp;
+		array_ = new_array;
 	}
 	array_[count_] = value;
 	++count_;
