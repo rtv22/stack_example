@@ -42,7 +42,7 @@ stack<T>::stack(const stack<T>& copy)
 	T *tmp = new T[copy.array_size_];
 	count_ = copy.count_;
 	array_size_ = copy.array_size_;
-	array_ = tmp
+	array_ = tmp;
 	try{
 		std::copy(copy.array_, copy.array_ + count_, array_);
 	}
