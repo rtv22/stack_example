@@ -100,8 +100,9 @@ void stack<T>::push(T const &value)
 		}
 		catch(...)
 		{
-			   delete[] array_;
-			   throw;
+			delete[] array_;
+		        array_ = new_array;
+			throw;
 		}
 		delete[] array_;
 		array_ = new_array;
