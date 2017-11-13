@@ -97,15 +97,13 @@ void stack<T>::push(T const &value)
 		try
 		{
 		std::copy(array_, array_ + count_, new_array);
+		delete[] array_;
+		array_ = new_array;
 		}
 		catch(...)
 		{
-			delete[] array_;
-		        array_ = new_array;
 			throw;
 		}
-		delete[] array_;
-		array_ = new_array;
 	}
 	array_[count_] = value;
 	++count_;
