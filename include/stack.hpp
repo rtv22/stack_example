@@ -11,8 +11,9 @@ public:
 	size_t count() const; /*noexcept*/
 	void print()const;/*noexcept*/
 	void push(T const &); /*strong*/
-	void swap(stack<T>&); /*noexcept*/
-	std::shared_ptr<T> pop(); /*strong*/
+	auto try_pop()->std::shared_ptr<T>;
+	auto wait_and_pop()->std::shared_ptr<T>;
+	//std::shared_ptr<T> pop(); /*strong*/
 	/*T top(); strong*/
 	stack<T>& operator=(stack<T> &); /*noexcept*/
 	~stack();/*noexcept*/
@@ -21,6 +22,7 @@ private:
 	mutable std::mutex mutex_;
 	size_t array_size_;
 	size_t count_;
+	std::condition_variable cVar;
 };
 
 template <typename T> 
@@ -51,13 +53,34 @@ stack<T>::stack(const stack<T>& copy)
 		delete[] array_;
 	}
 }
-	
+
+template <typename T>
+auto stack<T>::try_pop() -> std::shared_ptr<T>
+{
+	std::lock_guard<std::mutex> lock(mutex_);
+	if (count_ == 0)
+		return nullptr;
+	--count_;
+	return  std::make_shared<T>(array_[count_]);
+}
 
 template<class T>
 size_t stack<T>::count() const
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 	return count_;
+}
+
+template <typename T>
+auto stack<T>::wait_and_pop() -> std::shared_ptr<T>
+{
+	std::unique_lock<std::mutex> lock(mutex_);
+	while (!count_)
+	{
+		cVar.wait(lock);
+	}
+	--count_;
+	return std::make_shared<T>(array_[count_]);
 }
 
 template<typename T> 
@@ -96,9 +119,9 @@ void stack<T>::push(T const &value)
 		T * new_array = new T[array_size_]();
 		try
 		{
-		std::copy(array_, array_ + count_, new_array);
-		delete[] array_;
-		array_ = new_array;
+			std::copy(array_, array_ + count_, new_array);
+			delete[] array_;
+			array_ = new_array;
 		}
 		catch(...)
 		{
@@ -107,6 +130,7 @@ void stack<T>::push(T const &value)
 	}
 	array_[count_] = value;
 	++count_;
+	cVar.notify_all();
 }
 
 template <typename T>
@@ -115,7 +139,7 @@ auto stack<T>::pop() -> std::shared_ptr<T>
 	std::lock_guard<std::mutex> lock(mutex_);
 	if (count_ == 0)
 	{
-		throw "Stack empty";
+		throw "logic error";
 	}
 	auto top = std::make_shared<T>(array_[count_ - 1]);;
 	--count_;
