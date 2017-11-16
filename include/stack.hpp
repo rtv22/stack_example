@@ -14,6 +14,7 @@ public:
 	void push(T const &); /*strong*/
 	auto try_pop()->std::shared_ptr<T>;
 	auto wait_and_pop()->std::shared_ptr<T>;
+	void swap(stack<T>&);
 	//std::shared_ptr<T> pop(); /*strong*/
 	/*T top(); strong*/
 	stack<T>& operator=(stack<T> &); /*noexcept*/
