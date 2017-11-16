@@ -17,7 +17,7 @@ SCENARIO("Pop", "[pop]") {
 	stack<int> A;
 	A.push(1);
 	A.push(2);
-	A.pop();
+	A.wait_and_pop(););
 	REQUIRE(A.count() == 1);
 }
 
