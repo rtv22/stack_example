@@ -83,16 +83,16 @@ auto stack<T>::wait_and_pop() -> std::shared_ptr<T>
 	return std::make_shared<T>(array_[count_]);
 }
 
-template<typename T> 
-void stack<T>::swap(stack& x) 
-{
-	std::lock(mutex_, x.mutex_);
-	std::swap(x.array_size_, array_size_);
-	std::swap(count_, x.count_);
-	std::swap(x.array_, array_);
-	x.mutex_.lock();
-	x.mutex_.unlock();
-}
+//template<typename T> 
+//void stack<T>::swap(stack& x) 
+//{
+//	std::lock(mutex_, x.mutex_);
+//	std::swap(x.array_size_, array_size_);
+//	std::swap(count_, x.count_);
+//	std::swap(x.array_, array_);
+//	x.mutex_.lock();
+//	x.mutex_.unlock();
+//}
 
 /*template <typename T>
 T stack<T>::top()
@@ -133,18 +133,18 @@ void stack<T>::push(T const &value)
 	cVar.notify_all();
 }
 
-template <typename T>
-auto stack<T>::pop() -> std::shared_ptr<T>
-{
-	std::lock_guard<std::mutex> lock(mutex_);
-	if (count_ == 0)
-	{
-		throw "logic error";
-	}
-	auto top = std::make_shared<T>(array_[count_ - 1]);;
-	--count_;
-	return top;
-}
+//template <typename T>
+//auto stack<T>::pop() -> std::shared_ptr<T>
+//{
+//	std::lock_guard<std::mutex> lock(mutex_);
+//	if (count_ == 0)
+//	{
+//		throw "logic error";
+//	}
+//	auto top = std::make_shared<T>(array_[count_ - 1]);;
+//	--count_;
+//	return top;
+//}
 
 template <typename T>
 void stack<T>::print() const
@@ -161,7 +161,7 @@ stack<T>& stack<T>::operator=(stack<T> & other)
 	if (this != &other)
 	{
 		stack<T> tmp(other);
-		tmp.swap(*this);
+		//tmp.swap(*this);
 	}
 	return *this;
 }
