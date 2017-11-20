@@ -12,7 +12,7 @@ public:
 	size_t count() const; /*noexcept*/
 	void print()const;/*noexcept*/
 	void push(T const &); /*strong*/
-	auto try_pop()->std::shared_ptr<T>;
+	auto try_pop(const stack<T>&)->std::shared_ptr<T>;
 	auto wait_and_pop()->std::shared_ptr<T>;
 	void swap(stack<T>&);
 	//std::shared_ptr<T> pop(); /*strong*/
@@ -57,13 +57,13 @@ stack<T>::stack(const stack<T>& copy)
 }
 
 template <typename T>
-auto stack<T>::try_pop() -> std::shared_ptr<T>
+auto stack<T>::try_pop(const stack<T>&copy) -> std::shared_ptr<T>
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 	if (count_ == 0)
 		return nullptr;
-	--count_;
-	return  std::make_shared<T>(array_[count_]);
+	--copy.count_;
+	return  std::make_shared<T>(array_[copy.count_]);
 }
 
 template<class T>
